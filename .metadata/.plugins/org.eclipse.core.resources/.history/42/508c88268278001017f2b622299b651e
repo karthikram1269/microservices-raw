@@ -1,0 +1,7 @@
+@FeignClient(name = "patient-service", url = "http://localhost:8090/api/v1/patients")
+public interface PatientClient {
+
+    @GetMapping("/{id}")
+    PatientDTO getPatientById(@PathVariable("id") Long id);
+
+}

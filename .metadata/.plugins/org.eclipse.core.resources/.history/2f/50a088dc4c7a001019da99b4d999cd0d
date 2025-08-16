@@ -1,0 +1,46 @@
+package com.wipro.gp.controller;
+
+import com.wipro.gp.entities.MedicalRecord;
+import com.wipro.gp.services.MedicalRecordService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/v1/records")
+@RequiredArgsConstructor
+public class MedicalRecordController {
+
+    private final MedicalRecordService service;
+
+    @PostMapping("/save")
+    public MedicalRecord saveRecord(@RequestBody MedicalRecord record) {
+        return service.saveRecord(record);
+    }
+
+    @GetMapping("/{id}")
+    public MedicalRecord getRecord(@PathVariable Long id) {
+        return service.getRecord(id);
+    }
+
+    @GetMapping("/patient/{patientId}")
+    public List<MedicalRecord> getByPatient(@PathVariable Long patientId) {
+        return service.getRecordsByPatient(patientId);
+    }
+
+    @GetMapping("/doctor/{doctorId}")
+    public List<MedicalRecord> getByDoctor(@PathVariable Long doctorId) {
+        return service.getRecordsByDoctor(doctorId);
+    }
+
+    @GetMapping("/appointment/{appointmentId}")
+    public List<MedicalRecord> getByAppointment(@PathVariable Long appointmentId) {
+        return service.getRecordsByAppointment(appointmentId);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteRecord(@PathVariable Long id) {
+        service.deleteRecord(id);
+    }
+}

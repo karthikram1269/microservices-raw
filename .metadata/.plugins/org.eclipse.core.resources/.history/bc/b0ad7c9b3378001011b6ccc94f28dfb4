@@ -1,0 +1,61 @@
+package com.wipro.gp.entity;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "appointments", indexes = {
+		@Index(name = "idx_appt_doctor_dt", columnList = "doctorId,appointmentDateTime"),
+		@Index(name = "idx_appt_patient_dt", columnList = "patientId,appointmentDateTime") })
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Appointment {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+
+	// References to external services (no FK)
+	@Column(nullable = false)
+	private Long patientId;
+
+	@Column(nullable = false)
+	private Long doctorId;
+
+	@Column(nullable = false)
+	private LocalDateTime appointmentDateTime;
+
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
+	private AppointmentStatus status;
+
+	// Collected at booking time (lightweight, NOT the full medical record)
+	@Column(length = 1000)
+	private String visitReason;
+
+	@Column(length = 2000)
+	private String notes; // doctor/internal notes, optional
+
+	@Column(nullable = false, updatable = false)
+	private LocalDateTime createdAt;
+
+	@Column(nullable = false)
+	private LocalDateTime updatedAt;
+
+	@PrePersist
+	void onCreate() {
+		createdAt = updatedAt = LocalDateTime.now();
+		if (status == null)
+			status = AppointmentStatus.BOOKED;
+	}
+
+	@PreUpdate
+	void onUpdate() {
+		updatedAt = LocalDateTime.now();
+	}
+}

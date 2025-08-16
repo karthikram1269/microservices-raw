@@ -1,0 +1,64 @@
+package com.wipro.gp.service;
+
+import com.wipro.gp.entities.Doctor;
+import com.wipro.gp.exception.DoctorNotFoundException;
+import com.wipro.gp.repo.DoctorRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class DoctorServiceImpl implements DoctorService {
+
+    private final DoctorRepository doctorRepository;
+
+    @Override
+    public Doctor addDoctor(Doctor doctor) {
+        return doctorRepository.save(doctor);
+    }
+
+    @Override
+    public List<Doctor> getAllDoctors() {
+        return doctorRepository.findAll();
+    }
+
+    @Override
+    public Doctor getDoctorById(Long id) {
+        return doctorRepository.findById(id)
+                .orElseThrow(() -> new DoctorNotFoundException("Doctor not found with id: " + id));
+    }
+
+    @Override
+    public Doctor updateDoctor(Long id, Doctor doctor) {
+        Doctor existing = getDoctorById(id);
+
+        if (doctor.getName() != null)
+            existing.setName(doctor.getName());
+        if (doctor.getSpecialization() != null)
+            existing.setSpecialization(doctor.getSpecialization());
+        if (doctor.getAvailableDay() != null)
+            existing.setAvailableDay(doctor.getAvailableDay());
+        if (doctor.getStartTime() != null)
+            existing.setStartTime(doctor.getStartTime());
+        if (doctor.getEndTime() != null)
+            existing.setEndTime(doctor.getEndTime());
+        if (doctor.getRating() != null)
+            existing.setRating(doctor.getRating());
+        if (doctor.getLeaveStartDate() != null)
+            existing.setLeaveStartDate(doctor.getLeaveStartDate());
+        if (doctor.getLeaveEndDate() != null)
+            existing.setLeaveEndDate(doctor.getLeaveEndDate());
+
+        return doctorRepository.save(existing);
+    }
+
+    @Override
+    public String getDoctorAvailability(Long id) {
+        Doctor doctor = getDoctorById(id);
+        return "Available on " + doctor.getAvailableDay() +
+                " from " + doctor.getStartTime() +
+                " to " + doctor.getEndTime();
+    }
+}

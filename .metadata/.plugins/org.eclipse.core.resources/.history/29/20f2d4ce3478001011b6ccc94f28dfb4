@@ -1,0 +1,33 @@
+package com.wipro.gp;
+
+import com.wipro.gp.appointments.entities.Appointment;
+import com.wipro.gp.appointments.enums.AppointmentStatus;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
+
+public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
+
+    // Prevent double booking (e.g., same minute) for blocking statuses
+    boolean existsByDoctorIdAndAppointmentDateTimeAndStatusIn(
+            Long doctorId, LocalDateTime appointmentDateTime, Collection<AppointmentStatus> statuses);
+
+    List<Appointment> findByPatientIdAndAppointmentDateTimeBetween(
+            Long patientId, LocalDateTime startInclusive, LocalDateTime endExclusive);
+
+    List<Appointment> findByDoctorIdAndAppointmentDateTimeBetween(
+            Long doctorId, LocalDateTime startInclusive, LocalDateTime endExclusive);
+
+    default List<Appointment> findByPatientIdAndDate(Long patientId, LocalDate date) {
+        return findByPatientIdAndAppointmentDateTimeBetween(
+                patientId, date.atStartOfDay(), date.plusDays(1).atStartOfDay());
+    }
+
+    default List<Appointment> findByDoctorIdAndDate(Long doctorId, LocalDate date) {
+        return findByDoctorIdAndAppointmentDateTimeBetween(
+                doctorId, date.atStartOfDay(), date.plusDays(1).atStartOfDay());
+    }
+}

@@ -1,0 +1,19 @@
+package com.wipro.gp.repo;
+
+import com.wipro.gp.entities.Appointment;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
+
+//    Appointment findByDoctorIdAndAppointmentDateTime(Long doctorId, LocalDateTime appointmentDateTime);
+//
+    List<Appointment> findByPatientIdAndAppointmentDateTime(Long patientId, LocalDateTime appointmentDateTime);
+//
+    Appointment findByPatientId(Long patientId);
+//
+//    List<Appointment> findByDoctorId(Long doctorId);
+//
+    List<Appointment> findByStatus(AppointmentStatus status);
+}

@@ -1,0 +1,11 @@
+package com.wipro.gp.repo;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+public interface PatientService {
+    Patient registerPatient(Patient patient);
+    Patient getPatient(Long id);
+    Patient updatePatient(Long id, Patient patient);
+    Page<Patient> searchPatients(String query, Pageable pageable);
+}

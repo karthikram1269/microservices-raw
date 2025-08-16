@@ -1,0 +1,13 @@
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
+public class MedicalRecordResponse {
+    private Long appointmentId;
+    private Long patientId;
+    private Long doctorId;
+    private String prescription;
+    private String fileName;
+    private String note; // optional for fallback messages
+    private PatientDTO patient;
+    private DoctorDTO doctor;
+}

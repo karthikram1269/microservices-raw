@@ -1,0 +1,23 @@
+package com.wipro.gp.feign;
+
+import java.util.List;
+
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import com.wipro.gp.dto.DoctorDTO;
+
+@FeignClient(name = "DOCTOR-SERVICE", path = "/api/v1/doctors")
+public interface DoctorClient {
+
+	@GetMapping("/{id}")
+	DoctorDTO getDoctorById(@PathVariable("id") Long id);
+	
+	@GetMapping("/specialization")
+	List<DoctorDTO> getDoctorsBySpecialization(@RequestParam String sp);
+	 
+	@GetMapping("/getDocWithNote")
+	DoctorDTO withNotefetchDoctorBySpecialization(@RequestParam String specialization);
+}

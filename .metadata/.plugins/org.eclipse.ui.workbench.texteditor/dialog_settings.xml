@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<item key="hasShownOverlayPopupBefore" value="true"/>
+	<section name="java.lang.Class">
+		<item key="replaceBarOpen" value="true"/>
+		<list key="findhistory">
+			<item value="view"/>
+			<item value="io."/>
+			<item value="res"/>
+			<item value="feign"/>
+			<item value="resil"/>
+			<item value="zipkin"/>
+			<item value="RuntimeException"/>
+			<item value="request to add"/>
+			<item value="() "/>
+			<item value="Question"/>
+		</list>
+		<list key="replacehistory">
+			<item value="AppointmentBookingException"/>
+			<item value="().toLowerCase()"/>
+			<item value="Patient"/>
+		</list>
+	</section>
+</section>

@@ -1,0 +1,44 @@
+package com.wipro.gp.controller;
+
+import com.wipro.gp.entities.Doctor;
+import com.wipro.gp.service.DoctorService;
+
+import lombok.RequiredArgsConstructor;
+
+import org.springframework.web.bind.annotation.*;
+
+import java.time.DayOfWeek;
+import java.util.List;
+
+@RequiredArgsConstructor
+@RestController
+@RequestMapping("/api/v1/doctors")
+public class DoctorController {
+
+    private final DoctorService doctorService;
+
+    @PostMapping("/save")
+    public Doctor addDoctor(@RequestBody Doctor doctor) {
+    	 return doctorService.addDoctor(doctor);
+    }
+
+    @GetMapping("/{id}")
+    public Doctor getDoctorById(@PathVariable Long id) {
+        return doctorService.getDoctorById(id);
+    }
+
+    @GetMapping("/search")
+    public List<Doctor> getDoctorsByName(@RequestParam String name) {
+        return doctorService.getDoctorsByName(name);
+    }
+    
+    @GetMapping("/specialization")
+    public Doctor getDoctorsBySpecialization(@RequestParam String sp) {
+        return doctorService.getDoctorsBySpecialization(sp);
+    }
+
+    @GetMapping("/available")
+    public List<Doctor> getDoctorsByDay(@RequestParam DayOfWeek day) {
+        return doctorService.getDoctorsByDay(day);
+    }
+}

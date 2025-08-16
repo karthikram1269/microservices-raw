@@ -1,0 +1,62 @@
+package com.wipro.gp.services;
+
+import com.wipro.gp.dto.AppointmentDTO;
+import com.wipro.gp.entities.MedicalRecord;
+import com.wipro.gp.exception.MedicalRecordNotFoundException;
+import com.wipro.gp.feign.AppointmentClient;
+import com.wipro.gp.repo.MedicalRecordRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+@Transactional
+public class MedicalRecordServiceImpl implements MedicalRecordService {
+
+    private final MedicalRecordRepository repository;
+    private final AppointmentClient appointmentClient;
+
+    @Override
+    public MedicalRecord saveRecord(MedicalRecord record) {
+    	AppointmentDTO appointmentDTO = appointmentClient.getAppointmentById(record.getAppointmentId());
+    	
+    	if (appointmentDTO == null) {
+	        throw new MedicalRecordNotFoundException(
+	            "Appointment with id: " + record.getAppointmentId() + " does not exist");
+	    }
+    	
+    	record.setPatientId(appointmentDTO.getPatientId());
+    	record.setDoctorId(appointmentDTO.getDoctorId());
+    	record.setPrescription(appointmentDTO.getNotes());
+        return repository.save(record);
+    }
+
+    @Override
+    public MedicalRecord getRecord(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new MedicalRecordNotFoundException("Medical Record not found for ID: " + id));
+    }
+
+    @Override
+    public List<MedicalRecord> getRecordsByPatient(Long patientId) {
+        return repository.findByPatientId(patientId);
+    }
+
+    @Override
+    public List<MedicalRecord> getRecordsByDoctor(Long doctorId) {
+        return repository.findByDoctorId(doctorId);
+    }
+
+    @Override
+    public List<MedicalRecord> getRecordsByAppointment(Long appointmentId) {
+        return repository.findByAppointmentId(appointmentId);
+    }
+
+    @Override
+    public void deleteRecord(Long id) {
+        repository.deleteById(id);
+    }
+}

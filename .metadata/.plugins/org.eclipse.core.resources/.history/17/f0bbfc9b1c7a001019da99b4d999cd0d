@@ -1,0 +1,68 @@
+package com.wipro.gp.services.impl;
+
+import com.wipro.gp.clients.AppointmentClient;
+import com.wipro.gp.dto.AppointmentDTO;
+import com.wipro.gp.dto.MedicalRecordResponse;
+import com.wipro.gp.entities.MedicalRecord;
+import com.wipro.gp.repositories.MedicalRecordRepository;
+import com.wipro.gp.services.MedicalRecordService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.time.LocalDateTime;
+
+@Service
+@RequiredArgsConstructor
+public class MedicalRecordServiceImpl implements MedicalRecordService {
+
+    private final MedicalRecordRepository repository;
+    private final AppointmentClient appointmentClient;
+
+    @Override
+    public MedicalRecordResponse addRecordFromAppointment(Long appointmentId, String prescription, MultipartFile file) throws IOException {
+        // Fetch appointment details from appointment-service
+        AppointmentDTO appointment = appointmentClient.getAppointmentById(appointmentId);
+
+        // Create a new medical record
+        MedicalRecord record = new MedicalRecord();
+        record.setAppointmentId(appointment.getId());
+        record.setDoctorId(appointment.getDoctorId());
+        record.setPatientId(appointment.getPatientId());
+        record.setPrescription(prescription);
+        record.setCreatedAt(LocalDateTime.now());
+
+        if (file != null && !file.isEmpty()) {
+            record.setFileName(file.getOriginalFilename());
+            record.setFileType(file.getContentType());
+            record.setFileData(file.getBytes());
+        }
+
+        // Save and return response
+        MedicalRecord saved = repository.save(record);
+        return new MedicalRecordResponse(saved.getId(), saved.getPatientId(), saved.getDoctorId(),
+                saved.getPrescription(), saved.getCreatedAt());
+    }
+
+    @Override
+    public MedicalRecordResponse addRecordFallback(Long appointmentId, String prescription, MultipartFile file, Throwable t) throws IOException {
+        // Fallback handling — store record with limited info
+        MedicalRecord record = new MedicalRecord();
+        record.setAppointmentId(appointmentId);
+        record.setPrescription(prescription + " (Pending appointment service data)");
+        record.setCreatedAt(LocalDateTime.now());
+
+        if (file != null && !file.isEmpty()) {
+            record.setFileName(file.getOriginalFilename());
+            record.setFileType(file.getContentType());
+            record.setFileData(file.getBytes());
+        }
+
+        MedicalRecord saved = repository.save(record);
+
+        return new MedicalRecordResponse(saved.getId(), null, null,
+                saved.getPrescription() + " [Fallback due to: " + t.getMessage() + "]",
+                saved.getCreatedAt());
+    }
+}

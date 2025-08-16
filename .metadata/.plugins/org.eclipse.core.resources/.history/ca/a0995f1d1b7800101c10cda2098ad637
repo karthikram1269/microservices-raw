@@ -1,0 +1,13 @@
+package com.wipro.gp.service;
+
+import com.wipro.gp.entities.Doctor;
+
+import java.time.DayOfWeek;
+import java.util.List;
+
+public interface DoctorService {
+    Doctor saveDoctor(Doctor doctor);
+    List<Doctor> getAllDoctors();
+    List<Doctor> getDoctorsByName(String name);
+    List<Doctor> getDoctorsByAvailableDay(DayOfWeek dayOfWeek);
+}

@@ -1,0 +1,13 @@
+package com.wipro.gp.services;
+
+import com.wipro.gp.dto.MedicalRecordResponse;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+
+public interface MedicalRecordService {
+
+    MedicalRecordResponse addRecordFromAppointment(Long appointmentId, String prescription, MultipartFile file) throws IOException;
+
+    MedicalRecordResponse addRecordFallback(Long appointmentId, String prescription, MultipartFile file, Throwable t) throws IOException;
+}

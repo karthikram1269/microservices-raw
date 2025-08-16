@@ -1,0 +1,33 @@
+package com.wipro.gp.service;
+
+import com.wipro.gp.entities.Doctor;
+import com.wipro.gp.repo.DoctorRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.time.DayOfWeek;
+import java.util.List;
+import java.util.Optional;
+
+@Service
+@RequiredArgsConstructor
+public class DoctorServiceImpl implements DoctorService {
+
+	private final DoctorRepository doctorRepository;
+
+    public DoctorService(DoctorRepository doctorRepository) {
+        this.doctorRepository = doctorRepository;
+    }
+
+    public Optional<Doctor> getDoctorById(Long id) {
+        return doctorRepository.findById(id);
+    }
+
+    public List<Doctor> getDoctorsByName(String name) {
+        return doctorRepository.findByNameContainingIgnoreCase(name);
+    }
+
+    public List<Doctor> getDoctorsByDay(DayOfWeek day) {
+        return doctorRepository.findByAvailableDaysContaining(day);
+    }
+}

@@ -1,0 +1,9 @@
+package com.wipro.gp.repo;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface PatientRepository extends JpaRepository<Patient, Long> {
+    Page<Patient> findByFullNameContainingIgnoreCaseOrPhoneContaining(String name, String phone, Pageable pageable);
+}

@@ -1,0 +1,19 @@
+package com.wipro.gp.controller;
+
+import com.wipro.gp.entities.Payment;
+import com.wipro.gp.services.PaymentService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/v1/payments")
+@RequiredArgsConstructor
+public class PaymentController {
+
+    private final PaymentService paymentService;
+
+    @PostMapping
+    public Payment processPayment(@RequestBody Payment payment) {
+        return paymentService.processPayment(payment);
+    }
+}

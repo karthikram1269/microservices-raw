@@ -1,0 +1,43 @@
+package com.wipro.gp.service;
+import org.springframework.stereotype.Service;
+
+import com.wipro.gp.entities.Doctor;
+import com.wipro.gp.exception.DoctorNotFoundException;
+import com.wipro.gp.repo.DoctorRepository;
+
+import java.time.DayOfWeek;
+import java.util.List;
+
+@Service
+public class DoctorServiceImpl implements DoctorService{
+
+    private final DoctorRepository doctorRepository;
+
+    public DoctorServiceImpl(DoctorRepository doctorRepository) {
+        this.doctorRepository = doctorRepository;
+    }
+
+    public Doctor getDoctorById(Long id) {
+        return doctorRepository.findById(id)
+                .orElseThrow(() -> new DoctorNotFoundException("Doctor not found"));
+        
+    }
+
+    public List<Doctor> getDoctorsByName(String name) {
+        return doctorRepository.findByNameContainingIgnoreCase(name);
+    }
+
+    public List<Doctor> getDoctorsByDay(DayOfWeek day) {
+        return doctorRepository.findByAvailableDaysContaining(day);
+    }
+
+	@Override
+	public Doctor addDoctor(Doctor doctor) {
+		return doctorRepository.save(doctor);
+	}
+
+	@Override
+	public Doctor getDoctorsBySpecialization(String sp) {
+		return doctorRepository.getDoctorsBySpecialization(sp);
+	}
+}

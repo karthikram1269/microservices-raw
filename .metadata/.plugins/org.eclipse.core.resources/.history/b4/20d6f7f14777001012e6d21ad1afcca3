@@ -1,0 +1,29 @@
+spring.application.name=API-GATEWAY
+server.port=8765
+
+
+# Config Server URL
+spring.config.import=optional:configserver:http://localhost:9092
+
+
+eureka.instance.prefer-ip-address=true
+eureka.instance.hostname=localhost
+# Explicitly disable the discovery locator to prevent conflicts with manual routes.
+# Manual routes offer better control and are generally preferred.
+spring.cloud.gateway.server.webflux.discovery.locator.enabled=false
+spring.cloud.gateway.server.webflux.discovery.locator.lower-case-service-id=true
+
+# Eureka client configuration
+eureka.client.fetch-registry=true
+eureka.client.register-with-eureka=true
+eureka.client.service-url.defaultZone=http://localhost:8761/eureka/
+
+# ------------------------------------
+# Route for PATIENT-SERVICE
+# ------------------------------------
+
+
+spring.cloud.gateway.server.webflux.routes[0].id=patient-service-route
+spring.cloud.gateway.server.webflux.routes[0].uri=lb://PATIENT-SERVICE
+spring.cloud.gateway.server.webflux.routes[0].predicates[0]=Path=/patients/**
+

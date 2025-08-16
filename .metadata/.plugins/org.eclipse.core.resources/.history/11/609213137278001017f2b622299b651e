@@ -1,0 +1,11 @@
+package com.wipro.gp.dto;
+
+import lombok.Data;
+
+import java.time.LocalDateTime;
+
+@Data
+public class RescheduleRequest {
+    private LocalDateTime newDateTime;
+    private String note; // optional reason for reschedule
+}

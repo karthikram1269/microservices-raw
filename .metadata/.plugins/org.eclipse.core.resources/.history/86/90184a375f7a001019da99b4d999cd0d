@@ -1,0 +1,73 @@
+package com.wipro.gp.services;
+
+import com.wipro.gp.dto.AppointmentDTO;
+import com.wipro.gp.entities.Payment;
+import com.wipro.gp.exception.PaymentNotFoundException;
+import com.wipro.gp.feign.AppointmentClient;
+import com.wipro.gp.repo.PaymentRepository;
+
+import java.util.Random;
+
+import org.springframework.stereotype.Service;
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
+public class PaymentService {
+
+	private final PaymentRepository paymentRepository;
+	private final AppointmentClient appointmentClient;
+
+	public Payment processPayment(Payment payment) {
+		// Fetch appointment details
+		AppointmentDTO appointment = appointmentClient.getAppointmentById(payment.getAppointmentId());
+
+		if (appointment == null) {
+			throw new PaymentNotFoundException("Appointment with ID " + payment.getAppointmentId() + " not found!");
+		}
+
+		double amount = getAmountFromSpecialization(appointment.getSpecialization());
+
+		payment.setAmount(amount);
+
+		if (payment.getAmount() != 0 && payment.getAmount() > 0) {
+			payment.setPatientId(appointment.getPatientId());
+			long timestamp = System.currentTimeMillis();
+	        
+	        // Generate a random number
+	        Random random = new Random();
+	        Long randomNumber = random.nextLong(9000) + 1000;
+			payment.setBillId("B"+timestamp+randomNumber);
+			payment.setPaymentStatus("SUCCESS");
+		} else {
+			payment.setPaymentStatus("FAILED");
+		}
+
+		return paymentRepository.save(payment);
+	}
+
+	public double getAmountFromSpecialization(String specialization) {
+
+		if (specialization.equals("CARDIOLOGY")) {
+			return 2323.34;
+		}
+		if (specialization.equals("NEUROLOGY")) {
+			return 3451.42;
+		}
+		if (specialization.equals("ONCOLOGY")) {
+			return 5634.32;
+		}
+		if (specialization.equals("DERMATOLOGY")) {
+			return 2088.34;
+		}
+		if (specialization.equals("PEDIATRICS")) {
+			return 1242.23;
+		}
+		return 0;
+	}
+
+	public Payment getPaymentById(Long id) {
+		return paymentRepository.findById(id)
+				.orElseThrow(() -> new PaymentNotFoundException("Payment with ID " + id + " not found!"));
+	}
+}

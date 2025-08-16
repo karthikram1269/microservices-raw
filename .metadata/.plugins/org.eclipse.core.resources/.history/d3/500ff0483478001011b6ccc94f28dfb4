@@ -1,0 +1,13 @@
+package com.wipro.gp.appointments.dto;
+
+import lombok.Data;
+
+import java.time.LocalDateTime;
+
+@Data
+public class AppointmentRequest {
+    private Long patientId;
+    private Long doctorId;
+    private LocalDateTime appointmentDateTime; // e.g. 2025-08-13T10:30:00
+    private String visitReason; // current health summary / reason for visit
+}

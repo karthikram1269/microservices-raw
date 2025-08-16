@@ -1,0 +1,35 @@
+package com.wipro.gp.services;
+
+import com.wipro.gp.dto.AppointmentDTO;
+import com.wipro.gp.entities.Payment;
+import com.wipro.gp.enums.PaymentType;
+import com.wipro.gp.feign.AppointmentClient;
+import com.wipro.gp.repo.PaymentRepository;
+import org.springframework.stereotype.Service;
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
+public class PaymentService {
+
+    private final PaymentRepository paymentRepository;
+    private final AppointmentClient appointmentClient;
+
+    public Payment processPayment(Payment payment) {
+        // Fetch appointment details
+        AppointmentDTO appointment = appointmentClient.getAppointmentById(payment.getAppointmentId());
+
+        if (appointment == null) {
+            throw new RuntimeException("Appointment not found!");
+        }
+
+        // Business logic (just a dummy success flow)
+        if (payment.getAmount() != null && payment.getAmount() > 0) {
+            payment.setPaymentStatus("SUCCESS");
+        } else {
+            payment.setPaymentStatus("FAILED");
+        }
+
+        return paymentRepository.save(payment);
+    }
+}

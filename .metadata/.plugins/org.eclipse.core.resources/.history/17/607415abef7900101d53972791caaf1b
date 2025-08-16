@@ -1,0 +1,12 @@
+package com.wipro.gp.exception;
+
+public class AppointmentException extends RuntimeException {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -183L;
+
+	public AppointmentException(String message) {
+        super(message);
+    }
+}

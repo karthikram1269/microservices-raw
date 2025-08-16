@@ -1,0 +1,13 @@
+package com.wipro.gp.client;
+
+import java.util.List;
+import com.wipro.gp.entities.Appointment;
+
+public interface AppointmentService {
+    Appointment bookAppointment(Appointment appointment);
+    Appointment getAppointmentById(Long id);
+    List<Appointment> getAppointmentsByPatient(Long patientId);
+    List<Appointment> getAppointmentsByDoctor(Long doctorId);
+    Appointment updateAppointment(Long id, Appointment appointment);
+    void cancelAppointment(Long id);
+}

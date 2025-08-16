@@ -1,0 +1,15 @@
+
+import lombok.Data;
+
+import java.time.DayOfWeek;
+import java.time.LocalTime;
+import java.util.Set;
+
+@Data
+public class DoctorProfile {
+    private Long id;
+    private Set<DayOfWeek> availableDays;
+    private LocalTime startTime;
+    private LocalTime endTime;
+    private boolean onLeave; // if you expose it
+}

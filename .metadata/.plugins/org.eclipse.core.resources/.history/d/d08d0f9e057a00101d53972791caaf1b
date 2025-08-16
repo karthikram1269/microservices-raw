@@ -1,0 +1,133 @@
+package com.wipro.gp.services;
+
+import com.wipro.gp.dto.DoctorDTO;
+import com.wipro.gp.dto.PatientDTO;
+import com.wipro.gp.entities.Appointment;
+import com.wipro.gp.enums.AppointmentStatus;
+import com.wipro.gp.exception.AppointmentNotFoundException;
+import com.wipro.gp.feign.DoctorClient;
+import com.wipro.gp.feign.PatientClient;
+import com.wipro.gp.repo.AppointmentRepository;
+
+import lombok.RequiredArgsConstructor;
+
+import java.time.LocalDateTime;
+import java.util.Optional;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
+@Service
+@RequiredArgsConstructor
+public class AppointmentServiceImpl implements AppointmentService {
+
+//    private final GlobalExceptionHandler globalExceptionHandler;
+
+	private final AppointmentRepository repository;
+	private final DoctorClient doctorClient;
+	private final PatientClient patientClient;
+
+//    AppointmentServiceImpl(GlobalExceptionHandler globalExceptionHandler) {
+//        this.globalExceptionHandler = globalExceptionHandler;
+//    }
+
+	@Override
+	public Appointment bookAppointment(Appointment appointment) {
+
+	    Optional<Appointment> existingOpt = repository.findByPatientId(appointment.getPatientId());
+
+	    Appointment toSave;
+	    if (existingOpt.isPresent()) {
+	        toSave = existingOpt.get();
+	        toSave.setNotes(appointment.getNotes());
+	        toSave.setAppointmentDateTime(
+	            appointment.getAppointmentDateTime() != null
+	                ? appointment.getAppointmentDateTime()
+	                : toSave.getAppointmentDateTime()
+	        );
+	    } else {
+	        toSave = appointment;
+	    }
+
+	    PatientDTO p = patientClient.getPatientById(toSave.getPatientId());
+	    if (p == null) {
+	        throw new AppointmentNotFoundException(
+	            "Patient with id: " + toSave.getPatientId() + " does not exist");
+	    }
+
+	    String forSp = getSpecializationFromNote(toSave.getNotes());
+	    DoctorDTO doc = null;
+	    if (forSp != null) {
+	        doc = doctorClient.withNotefetchDoctorBySpecialization(forSp);
+	    }
+
+	    if (doc == null) {
+	        toSave.setDoctorId(null);
+	        toSave.setSpecialization(null);
+	        toSave.setStatus(AppointmentStatus.CANCELLED);
+	    } else {
+	        toSave.setDoctorId(doc.getId());
+	        toSave.setSpecialization(doc.getSpecialization());
+	        toSave.setStatus(AppointmentStatus.BOOKED);
+	    }
+
+	    if (toSave.getAppointmentDateTime() == null) {
+	        toSave.setAppointmentDateTime(LocalDateTime.now());
+	    }
+
+	    return repository.save(toSave);
+	}
+
+
+
+
+	public String getSpecializationFromNote(String note) {
+		String lowerCaseNote = note.toLowerCase();
+
+		if (lowerCaseNote.contains("chest pain")) {
+			return "CARDIOLOGY";
+		}
+		if (lowerCaseNote.contains("headache")) {
+			return "NEUROLOGY";
+		}
+		if (lowerCaseNote.contains("lump")) {
+			return "ONCOLOGY";
+		}
+		if (lowerCaseNote.contains("rash")) {
+			return "DERMATOLOGY";
+		}
+		if (lowerCaseNote.contains("fever")) {
+			return "PEDIATRICS";
+		}
+		return null;
+	}
+
+	@Override
+	public Appointment getAppointment(Long id) {
+		return repository.getReferenceById(id);
+	}
+
+	@Override
+	public Appointment getAppointmentsByPatientId(Long patientId) {
+		return repository.findByPatientId(patientId)
+				.orElseThrow(() -> new AppointmentNotFoundException(
+                        "Question with ID " + patientId + " not found"));
+	}
+
+	@Override
+	public Page<Appointment> getAppointmentsByDoctorId(Long doctorId, Pageable pageable) {
+		return repository.findByDoctorId(doctorId,pageable);
+	}
+
+	@Override
+	public Appointment rescheduleAppointment(Long id, Appointment appointment) {
+		Appointment ap = bookAppointment(appointment);
+		return ap;
+	}
+
+	@Override
+	public void cancelAppointment(Long id) {
+		repository.deleteById(id);
+	}
+}

@@ -1,0 +1,20 @@
+package com.wipro.gp.repo;
+
+import com.wipro.gp.entities.Appointment;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
+
+    List<Appointment> findByPatientIdAndAppointmentDateTimeBetween(
+            Long patientId, LocalDateTime start, LocalDateTime end);
+
+    List<Appointment> findByDoctorIdAndAppointmentDateTimeBetween(
+            Long doctorId, LocalDateTime start, LocalDateTime end);
+
+    boolean existsByDoctorIdAndAppointmentDateTime(Long doctorId, LocalDateTime dateTime);
+
+    boolean existsByPatientIdAndAppointmentDateTime(Long patientId, LocalDateTime dateTime);
+}

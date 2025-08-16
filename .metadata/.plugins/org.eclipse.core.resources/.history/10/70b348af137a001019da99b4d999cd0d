@@ -1,0 +1,13 @@
+package com.wipro.gp.feign;
+
+import com.wipro.gp.dto.AppointmentDTO;
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
+@FeignClient(name = "APPOINTMENT-SERVICE", path = "/appointments")
+public interface AppointmentClient {
+
+    @GetMapping("/{id}")
+    AppointmentDTO getAppointmentById(@PathVariable("id") Long id);
+}

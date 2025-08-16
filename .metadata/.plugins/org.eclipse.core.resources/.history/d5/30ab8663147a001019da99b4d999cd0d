@@ -1,0 +1,47 @@
+package com.wipro.gp.services;
+
+import com.wipro.gp.dto.AppointmentDTO;
+import com.wipro.gp.entities.MedicalRecord;
+import com.wipro.gp.exception.MedicalRecordNotFoundException;
+import com.wipro.gp.feign.AppointmentClient;
+import com.wipro.gp.repo.MedicalRecordRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.IOException;
+
+@Service
+@RequiredArgsConstructor
+public class MedicalRecordServiceImpl implements MedicalRecordService {
+
+    private final MedicalRecordRepository repository;
+    private final AppointmentClient appointmentClient;
+
+    @Override
+    public MedicalRecord addRecordFromAppointment(Long appointmentId, String description, MultipartFile file) throws IOException {
+        AppointmentDTO appointment = appointmentClient.getAppointmentById(appointmentId);
+        if (appointment == null) {
+            throw new MedicalRecordNotFoundException("Appointment not found with id: " + appointmentId);
+        }
+
+        String filePath = null;
+        if (file != null && !file.isEmpty()) {
+            String uploadDir = "uploads/";
+            File dir = new File(uploadDir);
+            if (!dir.exists()) dir.mkdirs();
+            filePath = uploadDir + file.getOriginalFilename();
+            file.transferTo(new File(filePath));
+        }
+
+        MedicalRecord record = new MedicalRecord();
+        record.setAppointmentId(appointmentId);
+        record.setPatientId(appointment.getPatientId());
+        record.setDoctorId(appointment.getDoctorId());
+        record.setPrescription(description);
+        record.setFilePath(filePath);
+
+        return repository.save(record);
+    }
+}

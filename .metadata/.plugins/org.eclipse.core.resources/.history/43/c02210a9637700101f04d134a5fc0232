@@ -1,0 +1,11 @@
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+@Data
+@AllArgsConstructor
+public class DoctorAvailabilityDTO {
+    private Long doctorId;
+    private boolean available;
+    private String availabilitySchedule;
+}

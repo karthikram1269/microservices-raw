@@ -1,0 +1,13 @@
+package com.wipro.gp.service;
+
+import com.wipro.gp.entities.Doctor;
+
+import java.util.List;
+
+public interface DoctorService {
+    Doctor addDoctor(Doctor doctor);
+    List<Doctor> getAllDoctors();
+    Doctor getDoctorById(Long id);
+    Doctor updateDoctor(Long id, Doctor doctor);
+    String getDoctorAvailability(Long id);
+}

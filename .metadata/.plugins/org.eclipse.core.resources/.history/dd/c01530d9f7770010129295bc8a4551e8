@@ -1,0 +1,58 @@
+package com.wipro.gp.service;
+
+import org.springframework.stereotype.Service;
+
+import com.wipro.gp.dto.DoctorAvailabilityDTO;
+import com.wipro.gp.entities.Doctor;
+import com.wipro.gp.repo.DoctorRepository;
+
+import lombok.RequiredArgsConstructor;
+
+import java.time.LocalDate;
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class DoctorServiceImpl implements DoctorService {
+
+    private final DoctorRepository doctorRepository;
+
+    @Override
+    public Doctor addDoctor(Doctor doctor) {
+        return doctorRepository.save(doctor);
+    }
+
+    @Override
+    public List<Doctor> getAllDoctors() {
+        return doctorRepository.findAll();
+    }
+
+    @Override
+    public DoctorAvailabilityDTO checkAvailability(Long doctorId) {
+        Doctor doctor = doctorRepository.findById(doctorId)
+                .orElseThrow(() -> new RuntimeException("Doctor not found"));
+
+        boolean available = true;
+        if (doctor.getLeaveStartDate() != null && doctor.getLeaveEndDate() != null) {
+            LocalDate today = LocalDate.now();
+            available = today.isBefore(doctor.getLeaveStartDate()) || today.isAfter(doctor.getLeaveEndDate());
+        }
+
+        return new DoctorAvailabilityDTO(doctor.getId(), available, doctor.getAvailabilitySchedule());
+    }
+
+    @Override
+    public Doctor updateDoctor(Long doctorId, Doctor updatedDoctor) {
+        Doctor existingDoctor = doctorRepository.findById(doctorId)
+                .orElseThrow(() -> new RuntimeException("Doctor not found"));
+
+        existingDoctor.setName(updatedDoctor.getName());
+        existingDoctor.setSpecialization(updatedDoctor.getSpecialization());
+        existingDoctor.setAvailabilitySchedule(updatedDoctor.getAvailabilitySchedule());
+        existingDoctor.setRating(updatedDoctor.getRating());
+        existingDoctor.setLeaveStartDate(updatedDoctor.getLeaveStartDate());
+        existingDoctor.setLeaveEndDate(updatedDoctor.getLeaveEndDate());
+
+        return doctorRepository.save(existingDoctor);
+    }
+}

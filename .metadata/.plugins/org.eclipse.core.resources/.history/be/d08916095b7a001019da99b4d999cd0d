@@ -1,0 +1,40 @@
+package com.wipro.gp.services;
+
+import com.wipro.gp.dto.AppointmentDTO;
+import com.wipro.gp.entities.Payment;
+import com.wipro.gp.exception.PaymentNotFoundException;
+import com.wipro.gp.feign.AppointmentClient;
+import com.wipro.gp.repo.PaymentRepository;
+import org.springframework.stereotype.Service;
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
+public class PaymentService {
+
+    private final PaymentRepository paymentRepository;
+    private final AppointmentClient appointmentClient;
+
+    public Payment processPayment(Payment payment) {
+        // Fetch appointment details
+        AppointmentDTO appointment = appointmentClient.getAppointmentById(payment.getAppointmentId());
+
+        if (appointment == null) {
+            throw new PaymentNotFoundException("Appointment with ID " + payment.getAppointmentId() + " not found!");
+        }
+
+        // Business logic (dummy success flow)
+        if (payment.getAmount() != null && payment.getAmount() > 0) {
+            payment.setPaymentStatus("SUCCESS");
+        } else {
+            payment.setPaymentStatus("FAILED");
+        }
+
+        return paymentRepository.save(payment);
+    }
+
+    public Payment getPaymentById(Long id) {
+        return paymentRepository.findById(id)
+                .orElseThrow(() -> new PaymentNotFoundException("Payment with ID " + id + " not found!"));
+    }
+}

@@ -1,0 +1,31 @@
+package com.wipro.gp.entities;
+
+import com.wipro.gp.enums.RecordType;
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.time.LocalDateTime;
+
+@Entity
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class MedicalRecord {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private Long patientId;
+    private Long doctorId;
+
+    @Enumerated(EnumType.STRING)
+    private RecordType type; // PRESCRIPTION, TEST_RESULT, TREATMENT_HISTORY
+
+    private String description;
+
+    private String filePath; // If file is uploaded
+
+    private LocalDateTime createdAt;
+}

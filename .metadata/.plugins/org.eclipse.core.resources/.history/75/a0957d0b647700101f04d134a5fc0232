@@ -1,0 +1,39 @@
+package com.wipro.gp.controller;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.web.bind.annotation.*;
+
+import com.wipro.gp.entities.Doctor;
+import com.wipro.gp.service.DoctorService;
+
+@RestController
+@RequestMapping("/patients")
+@RequiredArgsConstructor
+public class DoctorController {
+
+    private final DoctorService doctorService;
+
+    @PostMapping("/save")
+    public Patient registerPatient(@RequestBody Doctor patient) {
+        return doctorService.registerPatient(patient);
+    }
+
+    @GetMapping("/{id}")
+    public Patient getPatient(@PathVariable Long id) {
+        return doctorService.getPatient(id);
+    }
+
+    @PutMapping("/{id}")
+    public Patient updatePatient(@PathVariable Long id, @RequestBody Patient patient) {
+        return doctorService.updatePatient(id, patient);
+    }
+
+    @GetMapping("/search")
+    public Page<Patient> searchPatientsByName(@RequestParam String name,
+                                              @RequestParam(defaultValue = "0") int page,
+                                              @RequestParam(defaultValue = "10") int size) {
+        return doctorService.searchPatientsByName(name, PageRequest.of(page, size));
+    }
+}

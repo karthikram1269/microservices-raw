@@ -1,0 +1,36 @@
+package com.wipro.gp.entities;
+
+import com.wipro.gp.enums.PaymentType;
+import jakarta.persistence.*;
+import lombok.*;
+@Entity
+@Table(name = "payments")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Payment {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = true)
+    private Long patientId;
+
+    @Column(nullable = true)
+    private Long billId;
+
+    @Column(nullable = false)  
+    private Long appointmentId;
+
+    @Column(nullable = true)
+    private Double amount;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = true)
+    private PaymentType paymentType;
+
+    @Column(nullable = true)
+    private String paymentStatus; // SUCCESS / FAILED / PENDING
+}

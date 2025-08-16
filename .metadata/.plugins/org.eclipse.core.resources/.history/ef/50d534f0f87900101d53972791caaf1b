@@ -1,0 +1,103 @@
+package com.wipro.gp.services;
+
+import com.wipro.gp.dto.DoctorDTO;
+import com.wipro.gp.dto.PatientDTO;
+import com.wipro.gp.entities.Appointment;
+import com.wipro.gp.enums.AppointmentStatus;
+import com.wipro.gp.exception.AppointmentNotFoundException;
+import com.wipro.gp.feign.DoctorClient;
+import com.wipro.gp.feign.PatientClient;
+import com.wipro.gp.repo.AppointmentRepository;
+
+import lombok.RequiredArgsConstructor;
+import java.util.List;
+
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
+@Service
+@RequiredArgsConstructor
+public class AppointmentServiceImpl implements AppointmentService {
+
+//    private final GlobalExceptionHandler globalExceptionHandler;
+
+	private final AppointmentRepository repository;
+	private final DoctorClient doctorClient;
+	private final PatientClient patientClient;
+
+//    AppointmentServiceImpl(GlobalExceptionHandler globalExceptionHandler) {
+//        this.globalExceptionHandler = globalExceptionHandler;
+//    }
+
+	@Override
+	public Appointment bookAppointment(Appointment appointment) {
+
+		PatientDTO p = patientClient.getPatientById(appointment.getPatientId());
+		DoctorDTO doc = null;
+		if (p != null) {
+			String forSp = getSpecializationFromNote(appointment.getNotes());
+			doc = doctorClient.withNotefetchDoctorBySpecialization(forSp);
+		} else
+			throw new AppointmentNotFoundException(" patient with id : " + appointment.getPatientId() + " not exists");
+
+		if (doc != null) {
+			appointment.setDoctorId(doc.getId());
+			appointment.setSpecialization(doc.getSpecialization());
+			appointment.setStatus(AppointmentStatus.BOOKED);
+		} else {
+			appointment.setStatus(AppointmentStatus.CANCELLED);
+			throw new AppointmentNotFoundException(" dcotor with id : " + appointment.getPatientId() + " not exists");
+		}
+
+		return repository.save(appointment);
+	}
+
+	public String getSpecializationFromNote(String note) {
+		String lowerCaseNote = note.toLowerCase();
+
+		if (lowerCaseNote.contains("chest pain")) {
+			return "CARDIOLOGY";
+		}
+		if (lowerCaseNote.contains("headache")) {
+			return "NEUROLOGY";
+		}
+		if (lowerCaseNote.contains("lump")) {
+			return "ONCOLOGY";
+		}
+		if (lowerCaseNote.contains("rash")) {
+			return "DERMATOLOGY";
+		}
+		if (lowerCaseNote.contains("fever")) {
+			return "PEDIATRICS";
+		}
+		return null;
+	}
+
+	@Override
+	public Appointment getAppointment(Long id) {
+		return repository.getReferenceById(id);
+	}
+
+	@Override
+	public Appointment getAppointmentsByPatientId(Long patientId) {
+		return repository.findByPatientId(patientId)
+				.orElseThrow(() -> new AppointmentNotFoundException(
+                        "Question with ID " + patientId + " not found"));
+	}
+
+	@Override
+	public Page<Appointment> getAppointmentsByDoctorId(Long doctorId, Pageable pageable) {
+		return repository.findByDoctorId(doctorId);
+	}
+
+	@Override
+	public Appointment rescheduleAppointment(Long id, Appointment appointment) {
+		Appointment ap = bookAppointment(appointment);
+		return ap;
+	}
+
+	@Override
+	public void cancelAppointment(Long id) {
+		repository.deleteById(id);
+	}
+}

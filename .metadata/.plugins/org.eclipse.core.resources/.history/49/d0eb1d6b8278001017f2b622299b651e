@@ -1,0 +1,6 @@
+@Data
+public class PatientDTO {
+    private Long id;
+    private String patientFullName;
+    private String phone;
+}

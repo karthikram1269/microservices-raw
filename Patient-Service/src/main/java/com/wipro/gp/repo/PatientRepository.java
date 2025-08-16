@@ -1,0 +1,13 @@
+package com.wipro.gp.repo;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+import com.wipro.gp.entities.Patient;
+
+public interface PatientRepository extends JpaRepository<Patient, Long> {
+	@Query(value = "SELECT * FROM patient p WHERE LOWER(p.patient_full_name) LIKE LOWER(CONCAT('%', :patientFullName, '%'))", countQuery = "SELECT COUNT(*) FROM patient p WHERE LOWER(p.patient_full_name) LIKE LOWER(CONCAT('%', :patientFullName, '%'))", nativeQuery = true)
+	Page<Patient> findByFullNameContainingIgnoreCase(String patientFullName, Pageable pageable);
+}

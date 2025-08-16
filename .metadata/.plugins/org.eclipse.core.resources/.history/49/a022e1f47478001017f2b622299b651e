@@ -1,0 +1,17 @@
+package com.wipro.gp.dto;
+
+import java.time.DayOfWeek;
+import java.time.LocalTime;
+import java.util.List;
+
+import lombok.Data;
+
+@Data
+public class DoctorDTO {
+    private Long id;
+    private String name;
+    private String specialization;
+    private List<DayOfWeek> availableDays;
+    private LocalTime startTime;
+    private LocalTime endTime;
+}

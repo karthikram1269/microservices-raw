@@ -1,0 +1,5 @@
+package com.wipro.gp.exception;
+
+public class ErrorMessage {
+
+}

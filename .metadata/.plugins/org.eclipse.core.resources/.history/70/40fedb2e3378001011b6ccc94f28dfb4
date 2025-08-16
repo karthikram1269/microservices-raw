@@ -1,0 +1,7 @@
+package com.wipro.gp.appointments.enums;
+
+public enum AppointmentStatus {
+    BOOKED,
+    COMPLETED,
+    CANCELLED
+}

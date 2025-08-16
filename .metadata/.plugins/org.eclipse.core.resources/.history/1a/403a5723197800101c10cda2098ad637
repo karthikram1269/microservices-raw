@@ -1,0 +1,19 @@
+package com.wipro.gp.repositories;
+
+import com.wipro.gp.entities.Doctor;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+import java.time.DayOfWeek;
+import java.util.List;
+
+public interface DoctorRepository extends JpaRepository<Doctor, Long> {
+
+    // JPQL Query for fetching by name
+    @Query("SELECT d FROM Doctor d WHERE LOWER(d.name) = LOWER(:name)")
+    List<Doctor> findByNameIgnoreCase(String name);
+
+    // JPQL Query for fetching by available day
+    @Query("SELECT d FROM Doctor d JOIN d.availableDays ad WHERE ad = :dayOfWeek")
+    List<Doctor> findByAvailableDay(DayOfWeek dayOfWeek);
+}

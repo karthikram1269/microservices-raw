@@ -1,0 +1,14 @@
+package com.wipro.gp.service;
+
+import com.wipro.gp.entities.Appointment;
+
+import java.time.LocalDate;
+import java.util.List;
+
+public interface AppointmentService {
+    Appointment bookAppointment(Appointment appointment);
+    Appointment rescheduleAppointment(Long id, Appointment updated);
+    void cancelAppointment(Long id);
+    Appointment getAppointmentById(Long id);
+    List<Appointment> searchAppointments(Long patientId, LocalDate date);
+}

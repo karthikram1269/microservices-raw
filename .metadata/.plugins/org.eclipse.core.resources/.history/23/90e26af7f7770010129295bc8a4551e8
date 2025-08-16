@@ -1,0 +1,47 @@
+package com.wipro.gp.controller;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+import java.util.List;
+
+import org.springframework.web.bind.annotation.*;
+
+import com.wipro.gp.dto.DoctorAvailabilityDTO;
+import com.wipro.gp.entities.Doctor;
+import com.wipro.gp.service.DoctorService;
+
+import jakarta.validation.Valid;
+
+@RestController
+@RequestMapping("/api/v1/doctor")
+@Slf4j
+@RequiredArgsConstructor
+public class DoctorController {
+
+	private final DoctorService doctorService;
+
+	@PostMapping("/save")
+	public Doctor addDoctor(@Valid @RequestBody Doctor doctor) {
+		log.info(" requested to add details of doctor");
+		return doctorService.addDoctor(doctor);
+	}
+
+	@GetMapping("/getAll")
+	public List<Doctor> getAllDoctors() {
+		log.info(" requested to list details of all doctors");
+		return doctorService.getAllDoctors();
+	}
+
+	@GetMapping("/availability/{id}")
+	public DoctorAvailabilityDTO checkAvailability(@PathVariable Long id) {
+		log.info(" requested to check availability of particular doctor");
+		return doctorService.checkAvailability(id);
+	}
+
+	@PutMapping("/{id}")
+	public Doctor updateDoctor(@PathVariable Long id, @RequestBody Doctor doctor) {
+		log.info(" requested to update details of doctor");
+		return doctorService.updateDoctor(id, doctor);
+	}
+}

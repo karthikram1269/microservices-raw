@@ -1,0 +1,87 @@
+package com.wipro.gp.service;
+import org.springframework.stereotype.Service;
+
+import com.wipro.gp.entities.Doctor;
+import com.wipro.gp.exception.DoctorNotFoundException;
+import com.wipro.gp.repo.DoctorRepository;
+
+import java.time.DayOfWeek;
+import java.util.List;
+import java.util.Random;
+
+@Service
+public class DoctorServiceImpl implements DoctorService{
+
+    private final DoctorRepository doctorRepository;
+
+    public DoctorServiceImpl(DoctorRepository doctorRepository) {
+        this.doctorRepository = doctorRepository;
+    }
+
+    public Doctor getDoctorById(Long id) {
+        return doctorRepository.findById(id)
+                .orElseThrow(() -> new DoctorNotFoundException("Doctor not found"));
+        
+    }
+
+    public List<Doctor> getDoctorsByName(String name) {
+        return doctorRepository.findByNameContainingIgnoreCase(name);
+    }
+
+    public List<Doctor> getDoctorsByDay(DayOfWeek day) {
+        return doctorRepository.findByAvailableDaysContaining(day);
+    }
+
+	@Override
+	public Doctor addDoctor(Doctor doctor) {
+		return doctorRepository.save(doctor);
+	}
+
+	@Override
+	public List<Doctor> getDoctorsBySpecialization(String specialization) {
+		return doctorRepository.getDoctorsBySpecialization(specialization);
+	}
+	
+	public String getSpecializationFromNote(String note) {
+	    String lowerCaseNote = note.toLowerCase();
+
+	    if (lowerCaseNote.contains("chest pain")) {
+	        return "CARDIOLOGY";
+	    }
+	    if (lowerCaseNote.contains("headache")) {
+	        return "NEUROLOGY";
+	    }
+	    if (lowerCaseNote.contains("lump")) {
+	    	return "ONCOLOGY";
+	    }
+	    if (lowerCaseNote.contains("rash")) {
+	    	return "DERMATOLOGY";
+	    }
+	    if (lowerCaseNote.contains("fever")) {
+	    	return "PEDIATRICS";
+	    }
+	    return null; 
+	}
+
+	@Override
+	public Doctor withNotefetchDoctorBySpecialization(String note) {
+		String specialization = getSpecializationFromNote(note);
+
+	    if (specialization != null) {
+	        // 2. Find all doctors with that specialization
+	        List<Doctor> doctors = doctorRepository.getDoctorsBySpecialization(specialization);
+
+	        // 3. Check if any doctors were found
+	        if (!doctors.isEmpty()) {
+	            // 4. Randomly select one doctor from the list
+	            Random random = new Random();
+	            int randomIndex = random.nextInt(doctors.size());
+	            return doctors.get(randomIndex);
+	        }
+	        throw new DoctorNotFoundException(" No doctors of "+specialization+" are available today");
+	    }
+
+	    // Return null or throw an exception if no matching doctor is found
+	    throw new DoctorNotFoundException(" No doctors of "+specialization+" are available today");
+	}
+}

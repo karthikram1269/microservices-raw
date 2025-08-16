@@ -1,0 +1,7 @@
+package com.wipro.gp.dto;
+@Data
+public class PatientDTO {
+    private Long id;
+    private String patientFullName;
+    private String phone;
+}

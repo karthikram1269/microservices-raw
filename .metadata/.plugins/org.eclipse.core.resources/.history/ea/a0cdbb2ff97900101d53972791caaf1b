@@ -1,0 +1,27 @@
+package com.wipro.gp.repo;
+
+import com.wipro.gp.entities.Appointment;
+import com.wipro.gp.enums.AppointmentStatus;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
+
+	Appointment findByDoctorIdAndAppointmentDateTime(Long doctorId, LocalDateTime appointmentDateTime);
+
+	List<Appointment> findByPatientIdAndAppointmentDateTime(Long patientId, LocalDateTime appointmentDateTime);
+
+	Optional<Appointment> findByPatientId(Long patientId);
+
+	Page<Appointment> findByDoctorId(Long doctorId, Pageable pageable);
+
+	List<Appointment> findByStatus(AppointmentStatus status);
+}

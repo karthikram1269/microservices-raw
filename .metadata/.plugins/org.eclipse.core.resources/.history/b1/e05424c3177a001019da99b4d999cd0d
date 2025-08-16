@@ -1,0 +1,15 @@
+package com.wipro.gp.dto;
+
+import com.wipro.gp.entities.MedicalRecord;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
+public class MedicalRecordResponse {
+    private MedicalRecord record;
+    private PatientDTO patient;
+    private DoctorDTO doctor;
+}

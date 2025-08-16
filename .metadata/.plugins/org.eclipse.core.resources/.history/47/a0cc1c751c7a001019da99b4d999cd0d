@@ -1,0 +1,36 @@
+package com.wipro.gp.controller;
+
+import com.wipro.gp.dto.MedicalRecordResponse;
+import com.wipro.gp.services.MedicalRecordService;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+
+@RestController
+@RequestMapping("/records")
+@RequiredArgsConstructor
+public class MedicalRecordController {
+
+    private final MedicalRecordService service;
+
+    @CircuitBreaker(name = "appointmentService", fallbackMethod = "addRecordFallback")
+    @PostMapping("/from-appointment/{appointmentId}")
+    public MedicalRecordResponse addRecordFromAppointment(
+            @PathVariable Long appointmentId,
+            @RequestParam String prescription,
+            @RequestParam(required = false) MultipartFile file) throws IOException {
+        // Logic handled fully in service
+        return service.addRecordFromAppointment(appointmentId, prescription, file);
+    }
+
+    // Fallback method — must match the same parameters + Throwable
+    public MedicalRecordResponse addRecordFallback(
+            Long appointmentId, String prescription, MultipartFile file, Throwable t) throws IOException {
+
+        // Fallback logic still in service
+        return service.addRecordFallback(appointmentId, prescription, file, t);
+    }
+}
